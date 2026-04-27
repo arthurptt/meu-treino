@@ -8,214 +8,105 @@
 <meta name="apple-mobile-web-app-title" content="Meu Treino">
 <title>Meu Treino</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap');
-
-  :root {
-    --orange: #E8541A;
-    --orange-dim: #b3400f;
-    --bg: #0f0f0f;
-    --bg2: #181818;
-    --bg3: #222;
-    --border: #2a2a2a;
-    --text: #f0f0f0;
-    --muted: #666;
-    --green: #3ecf6a;
-    --blue: #4a9eff;
-    --yellow: #f5c842;
-  }
-
-  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    min-height: 100vh;
-    padding-bottom: env(safe-area-inset-bottom);
-    overscroll-behavior: none;
-  }
-
-  /* ── TOP NAV ── */
-  .topbar {
-    position: sticky; top: 0; z-index: 100;
-    background: var(--bg);
-    border-bottom: 1px solid var(--border);
-    padding: 14px 20px 10px;
-    padding-top: calc(14px + env(safe-area-inset-top));
-  }
-  .topbar h1 {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 28px; letter-spacing: 2px;
-    color: var(--orange);
-  }
-  .topbar p { font-size: 11px; color: var(--muted); margin-top:1px; }
-
-  /* ── WEEK TABS ── */
-  .week-tabs {
-    display: flex; gap: 6px;
-    padding: 14px 20px 0;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-  .week-tabs::-webkit-scrollbar { display:none; }
-  .week-tab {
-    flex-shrink: 0;
-    background: var(--bg3); border: 1px solid var(--border);
-    border-radius: 20px; padding: 6px 16px;
-    font-size: 12px; font-weight: 500; color: var(--muted);
-    cursor: pointer; transition: all .2s;
-  }
-  .week-tab.active {
-    background: var(--orange); border-color: var(--orange);
-    color: #fff; font-weight: 600;
-  }
-
-  /* ── DAY CARDS ── */
-  .days { padding: 16px 16px 100px; display: flex; flex-direction: column; gap: 12px; }
-
-  .day-card {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    overflow: hidden;
-    transition: border-color .2s;
-  }
-  .day-card.done { border-color: var(--green); opacity: .75; }
-
-  .day-header {
-    display: flex; align-items: center; gap: 12px;
-    padding: 14px 16px;
-    cursor: pointer;
-    user-select: none;
-  }
-  .day-pill {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 11px; letter-spacing: 1.5px;
-    padding: 4px 10px; border-radius: 20px;
-    flex-shrink: 0;
-  }
-  .pill-forca  { background: #2a1a0a; color: #ffb347; }
-  .pill-corrida{ background: #0a1e2a; color: var(--blue); }
-  .pill-hibrido{ background: #1a0a2a; color: #c77dff; }
-  .pill-descanso{ background: #1a1a1a; color: var(--muted); }
-
-  .day-title { font-weight: 600; font-size: 15px; flex:1; }
-  .day-meta  { font-size: 11px; color: var(--muted); margin-top:1px; }
-
-  .chevron { color: var(--muted); font-size: 18px; transition: transform .25s; margin-left:auto; }
-  .day-card.open .chevron { transform: rotate(180deg); }
-
-  .check-btn {
-    width: 28px; height: 28px; border-radius: 50%;
-    border: 2px solid var(--border);
-    background: transparent;
-    display: flex; align-items:center; justify-content:center;
-    cursor: pointer; flex-shrink:0; transition: all .2s;
-    font-size: 14px; color: transparent;
-  }
-  .day-card.done .check-btn {
-    background: var(--green); border-color: var(--green); color: #fff;
-  }
-
-  /* ── BODY ── */
-  .day-body { display:none; padding: 0 16px 16px; }
-  .day-card.open .day-body { display:block; }
-
-  .section-label {
-    font-size: 10px; font-weight: 600; letter-spacing: 1.5px;
-    color: var(--orange); text-transform: uppercase;
-    margin: 14px 0 8px;
-  }
-
-  .exercise-row {
-    display: flex; align-items: flex-start; gap: 10px;
-    padding: 10px 12px; border-radius: 10px;
-    background: var(--bg3); margin-bottom: 6px;
-  }
-  .ex-check {
-    width: 20px; height: 20px; border-radius: 5px;
-    border: 2px solid var(--border); background: transparent;
-    cursor: pointer; flex-shrink:0; margin-top:2px;
-    transition: all .15s; display:flex; align-items:center; justify-content:center;
-    font-size:11px; color:transparent;
-  }
-  .ex-check.checked { background: var(--green); border-color: var(--green); color:#fff; }
-
-  .ex-info { flex:1; }
-  .ex-name { font-size: 14px; font-weight: 500; }
-  .ex-name.checked-text { text-decoration: line-through; color: var(--muted); }
-  .ex-detail { font-size: 11px; color: var(--muted); margin-top:2px; }
-
-  .ex-badge {
-    font-size: 10px; font-weight: 600; letter-spacing:.5px;
-    padding: 2px 8px; border-radius: 20px; flex-shrink:0;
-  }
-  .badge-pause { background:#1a1a2a; color: #8899ff; }
-  .badge-dist  { background:#0a1a10; color: var(--green); }
-  .badge-tempo { background:#1a1500; color: var(--yellow); }
-
-  .tip-box {
-    background: #1a1200; border: 1px solid #3a2e00;
-    border-radius: 10px; padding: 10px 12px; margin-top: 10px;
-    font-size: 12px; color: #c9a84c; line-height: 1.5;
-  }
-  .tip-box b { color: var(--yellow); }
-
-  /* ── PROGRESS BAR ── */
-  .progress-wrap { padding: 0 20px 4px; }
-  .progress-label { display:flex; justify-content:space-between; font-size:11px; color:var(--muted); margin-bottom:5px; }
-  .progress-bar { height:4px; background:var(--border); border-radius:4px; overflow:hidden; }
-  .progress-fill { height:100%; background:var(--orange); border-radius:4px; transition: width .4s; }
-
-  /* ── BOTTOM LEGEND ── */
-  .legend {
-    position: fixed; bottom: 0; left: 0; right: 0;
-    background: var(--bg); border-top: 1px solid var(--border);
-    padding: 10px 20px;
-    padding-bottom: calc(10px + env(safe-area-inset-bottom));
-    display:flex; gap:16px; flex-wrap:wrap;
-  }
-  .legend-item { display:flex; align-items:center; gap:6px; font-size:11px; color:var(--muted); }
-  .legend-dot { width:8px; height:8px; border-radius:50%; }
-
-  /* ── INSTALL BANNER ── */
-  .install-banner {
-    margin: 12px 16px 0;
-    background: #111; border: 1px solid #2a2a00;
-    border-radius: 12px; padding: 10px 14px;
-    font-size: 12px; color: var(--yellow);
-    display: flex; align-items:center; gap:10px;
-  }
-  .install-banner span { color: var(--muted); }
-  #install-close { margin-left:auto; cursor:pointer; color:var(--muted); font-size:18px; }
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap');
+:root{
+  --orange:#E8541A;--bg:#0f0f0f;--bg2:#181818;--bg3:#222;
+  --border:#2a2a2a;--text:#f0f0f0;--muted:#666;
+  --green:#3ecf6a;--blue:#4a9eff;--yellow:#f5c842;--purple:#c77dff;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;
+  padding-bottom:calc(70px + env(safe-area-inset-bottom));overscroll-behavior:none;}
+/* TOPBAR */
+.topbar{position:sticky;top:0;z-index:100;background:var(--bg);
+  border-bottom:1px solid var(--border);padding:14px 20px 10px;
+  padding-top:calc(14px + env(safe-area-inset-top));}
+.topbar h1{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:var(--orange);}
+.topbar p{font-size:11px;color:var(--muted);margin-top:1px;}
+/* WEEK TABS */
+.week-tabs{display:flex;gap:6px;padding:14px 20px 0;overflow-x:auto;scrollbar-width:none;}
+.week-tabs::-webkit-scrollbar{display:none;}
+.week-tab{flex-shrink:0;background:var(--bg3);border:1px solid var(--border);
+  border-radius:20px;padding:6px 16px;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .2s;}
+.week-tab.active{background:var(--orange);border-color:var(--orange);color:#fff;font-weight:600;}
+/* PROGRESS */
+.progress-wrap{padding:14px 20px 4px;}
+.progress-label{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:5px;}
+.progress-bar{height:4px;background:var(--border);border-radius:4px;overflow:hidden;}
+.progress-fill{height:100%;background:var(--orange);border-radius:4px;transition:width .4s;}
+/* DAYS */
+.days{padding:16px 16px 20px;display:flex;flex-direction:column;gap:12px;}
+.day-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;overflow:hidden;transition:border-color .2s;}
+.day-card.done{border-color:var(--green);}
+.day-header{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;user-select:none;}
+.day-pill{font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1.5px;padding:4px 10px;border-radius:20px;flex-shrink:0;}
+.pill-forca{background:#2a1a0a;color:#ffb347;}
+.pill-corrida{background:#0a1e2a;color:var(--blue);}
+.pill-hibrido{background:#1a0a2a;color:var(--purple);}
+.pill-descanso{background:#1a1a1a;color:var(--muted);}
+.day-title{font-weight:600;font-size:15px;}
+.day-meta{font-size:11px;color:var(--muted);margin-top:1px;}
+.chevron{color:var(--muted);font-size:18px;transition:transform .25s;margin-left:auto;flex-shrink:0;}
+.day-card.open .chevron{transform:rotate(180deg);}
+.check-btn{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);
+  background:transparent;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;flex-shrink:0;transition:all .2s;font-size:13px;color:transparent;}
+.day-card.done .check-btn{background:var(--green);border-color:var(--green);color:#fff;}
+/* BODY */
+.day-body{display:none;padding:0 16px 16px;}
+.day-card.open .day-body{display:block;}
+.section-label{font-size:10px;font-weight:600;letter-spacing:1.5px;color:var(--orange);text-transform:uppercase;margin:14px 0 8px;}
+/* EXERCISE ROW */
+.exercise-row{border-radius:10px;background:var(--bg3);margin-bottom:6px;overflow:hidden;}
+.ex-top{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;}
+.ex-check{width:20px;height:20px;border-radius:5px;border:2px solid var(--border);
+  background:transparent;cursor:pointer;flex-shrink:0;margin-top:2px;
+  transition:all .15s;display:flex;align-items:center;justify-content:center;font-size:11px;color:transparent;}
+.ex-check.checked{background:var(--green);border-color:var(--green);color:#fff;}
+.ex-info{flex:1;}
+.ex-name{font-size:14px;font-weight:500;}
+.ex-name.checked-text{text-decoration:line-through;color:var(--muted);}
+.ex-detail{font-size:11px;color:var(--muted);margin-top:2px;}
+.ex-badge{font-size:10px;font-weight:600;letter-spacing:.5px;padding:2px 8px;border-radius:20px;flex-shrink:0;align-self:flex-start;margin-top:2px;}
+.badge-pause{background:#1a1a2a;color:#8899ff;}
+.badge-dist{background:#0a1a10;color:var(--green);}
+.badge-tempo{background:#1a1500;color:var(--yellow);}
+/* WEIGHT LOG */
+.weight-row{display:flex;align-items:center;gap:8px;padding:0 12px 10px;border-top:1px solid var(--border);}
+.weight-label{font-size:11px;color:var(--muted);flex-shrink:0;}
+.weight-input{background:#111;border:1px solid var(--border);border-radius:8px;
+  color:var(--text);font-size:13px;padding:5px 10px;width:80px;text-align:center;
+  font-family:'DM Sans',sans-serif;}
+.weight-input:focus{outline:none;border-color:var(--orange);}
+.weight-sugg{font-size:11px;color:var(--green);flex:1;}
+/* TIP */
+.tip-box{background:#1a1200;border:1px solid #3a2e00;border-radius:10px;
+  padding:10px 12px;margin-top:10px;font-size:12px;color:#c9a84c;line-height:1.5;}
+.tip-box b{color:var(--yellow);}
+/* RUN BLOCK */
+.run-block{background:var(--bg3);border-radius:10px;padding:12px;margin-bottom:6px;}
+.run-block-title{font-size:13px;font-weight:600;margin-bottom:6px;}
+.run-detail{font-size:12px;color:var(--muted);line-height:1.6;}
+.run-detail span{color:var(--text);font-weight:500;}
+/* LEGEND */
+.legend{position:fixed;bottom:0;left:0;right:0;background:var(--bg);
+  border-top:1px solid var(--border);padding:10px 20px;
+  padding-bottom:calc(10px + env(safe-area-inset-bottom));display:flex;gap:16px;flex-wrap:wrap;}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);}
+.legend-dot{width:8px;height:8px;border-radius:50%;}
 </style>
 </head>
 <body>
-
 <div class="topbar">
   <h1>MEU TREINO</h1>
-  <p>Hyrox Training · Corrida + Força</p>
+  <p>Hyrox Training · Corrida + Força · 8 Semanas</p>
 </div>
-
-<div id="install-banner" class="install-banner">
-  📲 <span>Salvar na tela inicial: toque em <b style="color:#f5c842">⎙ Compartilhar</b> → <b style="color:#f5c842">Adicionar à Tela de Início</b></span>
-  <span id="install-close">×</span>
+<div class="progress-wrap">
+  <div class="progress-label"><span>Semana atual</span><span id="prog-label">0 / 5 treinos</span></div>
+  <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
 </div>
-
-<div style="padding:14px 20px 0">
-  <div class="progress-wrap" style="padding:0">
-    <div class="progress-label">
-      <span>Semana atual</span>
-      <span id="prog-label">0 / 5 treinos</span>
-    </div>
-    <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
-  </div>
-</div>
-
 <div class="week-tabs" id="week-tabs"></div>
-
 <div class="days" id="days-container"></div>
-
 <div class="legend">
   <div class="legend-item"><div class="legend-dot" style="background:#ffb347"></div>Força</div>
   <div class="legend-item"><div class="legend-dot" style="background:#4a9eff"></div>Corrida</div>
@@ -224,250 +115,735 @@
 </div>
 
 <script>
-const WEEKS = 8;
-const DAYS_DATA = [
-  {
-    key:'seg', label:'Segunda', pill:'forca', pillLabel:'FORÇA LOWER',
-    meta:'Agachamento · Lunge · Step-up · Panturrilha · Core',
-    tip:'<b>Dica:</b> Agachamento: desça até a coxa paralela ao chão. Nas primeiras semanas use 60% do máximo e foque na forma.',
-    sections:[
-      { title:'Aquecimento', items:[
-        { name:'Esteira inclinada', detail:'10 min · inclinação 6–8%', badge:null },
-        { name:'Mobilidade de quadril e tornozelo', detail:'5 min dinâmico', badge:null },
+// ── PLANO COMPLETO COM PROGRESSÃO ─────────────────────────────────────────
+// Cada semana tem estrutura: { seg, ter, qua, qui, sex }
+// Exercícios de força têm campo de peso (logWeight:true)
+// Corridas têm estrutura própria (type:'run')
+
+const PLAN = [
+  // ── SEMANA 1 ─────────────────────────────────────────────────────────
+  { week:1, label:"Adaptação — cargas conservadoras, foque na técnica",
+    seg:{ pill:'forca', pillLabel:'FORÇA LOWER', meta:'Agachamento · Lunge · Step-up · Core',
+      tip:'<b>Semana 1:</b> Não teste seu máximo. Use cargas que permitam executar com controle total. A técnica agora vale mais que o peso.',
+      sections:[
+        { title:'Aquecimento', items:[
+          {name:'Esteira inclinada',detail:'10 min · inclinação 6%'},
+          {name:'Mobilidade quadril e tornozelo',detail:'5 min dinâmico'},
+        ]},
+        { title:'Exercícios', items:[
+          {name:'Agachamento livre',detail:'3 séries × 8 reps',badge:'90s',logWeight:true,target:'Carga leve — foco em técnica'},
+          {name:'Lunge com halteres',detail:'3 séries × 10 cada perna',badge:'75s',logWeight:true,target:'12–14 kg cada'},
+          {name:'Step-up em banco',detail:'3 séries × 8 cada perna',badge:'60s',logWeight:true,target:'10–12 kg cada'},
+          {name:'Elevação de panturrilha',detail:'3 séries × 12 reps',badge:'45s'},
+        ]},
+        { title:'Core', items:[
+          {name:'Prancha frontal',detail:'3 séries × 30 segundos',badge:'45s'},
+          {name:'Dead bug',detail:'3 séries × 6 cada lado',badge:'45s'},
+        ]},
       ]},
-      { title:'Exercícios', items:[
-        { name:'Agachamento livre', detail:'4 séries × 10 reps · 60–70% 1RM', badge:'90s' },
-        { name:'Lunge com halteres', detail:'3 séries × 12 cada perna · 16–18 kg', badge:'75s' },
-        { name:'Step-up em banco', detail:'3 séries × 10 cada perna · 14–16 kg', badge:'60s' },
-        { name:'Elevação de panturrilha', detail:'3 séries × 15 reps', badge:'45s' },
+    ter:{ type:'run', pill:'corrida', pillLabel:'ZONE 2', meta:'Corrida leve contínua · 25 min',
+      tip:'<b>Zone 2:</b> Você deve conseguir falar frases inteiras. Se ficar sem fôlego, diminua o ritmo. Não tem vergonha nisso.',
+      warmup:'5 min caminhada',
+      main:'25 min corrida leve contínua',
+      pace:'7,0–7,5 km/h (ou ritmo que permita conversar)',
+      cooldown:'5 min caminhada',
+    },
+    qua:{ pill:'forca', pillLabel:'FORÇA UPPER', meta:"Remada · Desenvolvimento · Polia · Farmer's Carry",
+      tip:"<b>Farmer's Carry:</b> O exercício mais Hyrox do plano. Core contraído, ombros para trás, passos firmes e constantes.",
+      sections:[
+        { title:'Aquecimento', items:[
+          {name:'Remo leve ou bicicleta',detail:'8 min'},
+          {name:'Mobilidade de ombro',detail:'5 min dinâmico'},
+        ]},
+        { title:'Exercícios', items:[
+          {name:'Remada unilateral',detail:'3 séries × 10 cada',badge:'75s',logWeight:true,target:'24–26 kg'},
+          {name:'Desenvolvimento halteres',detail:'3 séries × 10',badge:'75s',logWeight:true,target:'14–16 kg'},
+          {name:'Puxada polia pegada neutra',detail:'3 séries × 10',badge:'75s',logWeight:true,target:'Carga moderada — sem balançar'},
+          {name:"Farmer's Carry",detail:'3 percursos × 40 m',badge:'90s',logWeight:true,target:'20–22 kg cada mão'},
+        ]},
+        { title:'Core', items:[
+          {name:'Flexão de braço',detail:'3 séries × 8–10 reps',badge:'60s'},
+          {name:'Hollow hold',detail:'3 séries × 20 segundos',badge:'45s'},
+        ]},
       ]},
-      { title:'Core', items:[
-        { name:'Prancha frontal', detail:'3 séries × 40 segundos', badge:'45s' },
-        { name:'Dead bug', detail:'3 séries × 8 cada lado', badge:'45s' },
+    qui:{ type:'run', pill:'corrida', pillLabel:'INTERVALADO', meta:'4 × 400 m · Esforço 7/10',
+      tip:'<b>Semana 1:</b> 4 tiros apenas. Mantenha o ritmo consistente em todos — mais importante que ir rápido no primeiro e morrer no último.',
+      warmup:'8 min corrida leve',
+      intervals:'4 × 400 m a 8,5 km/h (esforço 7/10)',
+      rest:'90s caminhada entre cada tiro',
+      cooldown:'8 min caminhada',
+    },
+    sex:{ pill:'hibrido', pillLabel:'HÍBRIDO', meta:'3 × 800 m + exercício funcional',
+      tip:'<b>Semana 1:</b> 3 rounds para adaptar. Não se preocupe com o ritmo — só conclua os rounds.',
+      sections:[
+        { title:'Aquecimento', items:[{name:'Corrida leve',detail:'5 min'}]},
+        { title:'Rounds', items:[
+          {name:'Round 1 · 800 m',detail:'8 km/h → 15 lunges halteres 10 kg',badge:'90s',logWeight:true,target:'10 kg'},
+          {name:"Round 2 · 800 m",detail:"8 km/h → Farmer's Carry 40 m · 16 kg",badge:'90s',logWeight:true,target:'16 kg cada'},
+          {name:'Round 3 · 800 m',detail:'8 km/h → 15 agachamentos halteres 12 kg',badge:'90s',logWeight:true,target:'12 kg'},
+        ]},
+        { title:'Desaquecimento', items:[{name:'Caminhada',detail:'5 min'}]},
       ]},
-    ]
   },
-  {
-    key:'ter', label:'Terça', pill:'corrida', pillLabel:'ZONE 2',
-    meta:'Corrida leve · ~30 min · 7–8,5 km/h',
-    tip:'<b>Teste do sussurro:</b> você deve conseguir falar frases inteiras. Se não conseguir, diminua o ritmo. Zone 2 = 60–70% FC máx.',
-    sections:[
-      { title:'Sessão', items:[
-        { name:'Caminhada aquecimento', detail:'5 min', badge:'dist' },
-        { name:'Corrida leve (Zone 2)', detail:'25–30 min · 7–8,5 km/h · frase inteira', badge:'tempo' },
-        { name:'Caminhada desaquecimento', detail:'5 min', badge:'dist' },
+  // ── SEMANA 2 ─────────────────────────────────────────────────────────
+  { week:2, label:"Construção — volume sobe, cargas aumentam 5–10%",
+    seg:{ pill:'forca', pillLabel:'FORÇA LOWER', meta:'Agachamento · Lunge · Step-up · Core',
+      tip:'<b>Semana 2:</b> Se a semana 1 ficou fácil, adicione 2,5–5 kg. Agora são 4 séries no agachamento.',
+      sections:[
+        { title:'Aquecimento', items:[
+          {name:'Esteira inclinada',detail:'10 min · inclinação 7%'},
+          {name:'Mobilidade quadril e tornozelo',detail:'5 min dinâmico'},
+        ]},
+        { title:'Exercícios', items:[
+          {name:'Agachamento livre',detail:'4 séries × 8 reps',badge:'90s',logWeight:true,target:'+2,5–5 kg vs semana 1'},
+          {name:'Lunge com halteres',detail:'3 séries × 12 cada perna',badge:'75s',logWeight:true,target:'14–16 kg cada'},
+          {name:'Step-up em banco',detail:'3 séries × 10 cada perna',badge:'60s',logWeight:true,target:'12–14 kg cada'},
+          {name:'Elevação de panturrilha',detail:'3 séries × 15 reps',badge:'45s'},
+        ]},
+        { title:'Core', items:[
+          {name:'Prancha frontal',detail:'3 séries × 35 segundos',badge:'45s'},
+          {name:'Dead bug',detail:'3 séries × 8 cada lado',badge:'45s'},
+        ]},
       ]},
-    ]
+    ter:{ type:'run', pill:'corrida', pillLabel:'ZONE 2', meta:'Corrida leve contínua · 30 min',
+      tip:'<b>Zone 2:</b> 5 min a mais que na semana passada. Mantenha o ritmo confortável — não acelere porque se sente bem.',
+      warmup:'5 min caminhada',
+      main:'30 min corrida leve contínua',
+      pace:'7,0–7,5 km/h',
+      cooldown:'5 min caminhada',
+    },
+    qua:{ pill:'forca', pillLabel:'FORÇA UPPER', meta:"Remada · Desenvolvimento · Polia · Farmer's Carry",
+      tip:'<b>Semana 2:</b> Adicione carga onde semana 1 ficou fácil. O Farmer\'s Carry agora tem 4 percursos.',
+      sections:[
+        { title:'Aquecimento', items:[
+          {name:'Remo leve ou bicicleta',detail:'8 min'},
+          {name:'Mobilidade de ombro',detail:'5 min dinâmico'},
+        ]},
+        { title:'Exercícios', items:[
+          {name:'Remada unilateral',detail:'4 séries × 10 cada',badge:'75s',logWeight:true,target:'+2 kg vs semana 1'},
+          {name:'Desenvolvimento halteres',detail:'3 séries × 10',badge:'75s',logWeight:true,target:'+2 kg vs semana 1'},
+          {name:'Puxada polia pegada neutra',detail:'3 séries × 10',badge:'75s',logWeight:true,target:'+5% vs semana 1'},
+          {name:"Farmer's Carry",detail:'4 percursos × 40 m',badge:'90s',logWeight:true,target:'+2 kg vs semana 1'},
+        ]},
+        { title:'Core', items:[
+          {name:'Flexão de braço',detail:'3 séries × 10 reps',badge:'60s'},
+          {name:'Hollow hold',detail:'3 séries × 25 segundos',badge:'45s'},
+        ]},
+      ]},
+    qui:{ type:'run', pill:'corrida', pillLabel:'INTERVALADO', meta:'5 × 400 m · Esforço 7/10',
+      tip:'<b>Semana 2:</b> Um tiro a mais. Se o ritmo da sem. 1 ficou confortável, pode tentar 9 km/h nos últimos 2 tiros.',
+      warmup:'8 min corrida leve',
+      intervals:'5 × 400 m a 8,5–9 km/h',
+      rest:'90s caminhada entre cada tiro',
+      cooldown:'8 min caminhada',
+    },
+    sex:{ pill:'hibrido', pillLabel:'HÍBRIDO', meta:'3 × 800 m + exercício funcional',
+      tip:'<b>Semana 2:</b> Mesmos 3 rounds, mas com cargas um pouco maiores. Tente não parar entre a corrida e o exercício.',
+      sections:[
+        { title:'Aquecimento', items:[{name:'Corrida leve',detail:'5 min'}]},
+        { title:'Rounds', items:[
+          {name:'Round 1 · 800 m',detail:'8–8,5 km/h → 18 lunges halteres 10–12 kg',badge:'90s',logWeight:true,target:'10–12 kg'},
+          {name:"Round 2 · 800 m",detail:"8–8,5 km/h → Farmer's Carry 40 m · 18 kg",badge:'90s',logWeight:true,target:'18 kg cada'},
+          {name:'Round 3 · 800 m',detail:'8–8,5 km/h → 18 agachamentos halteres 12–14 kg',badge:'90s',logWeight:true,target:'12–14 kg'},
+        ]},
+        { title:'Desaquecimento', items:[{name:'Caminhada',detail:'5 min'}]},
+      ]},
   },
-  {
-    key:'qua', label:'Quarta', pill:'forca', pillLabel:'FORÇA UPPER',
-    meta:'Remada · Desenvolvimento · Polia · Farmer\'s Carry · Core',
-    tip:'<b>Farmer\'s Carry</b> é o exercício mais Hyrox do plano. Mantenha o core contraído, ombros para trás e passos firmes.',
-    sections:[
-      { title:'Aquecimento', items:[
-        { name:'Remo leve ou bicicleta', detail:'8 min', badge:null },
-        { name:'Mobilidade de ombro', detail:'5 min dinâmico', badge:null },
+  // ── SEMANA 3 ─────────────────────────────────────────────────────────
+  { week:3, label:"Carga — semana mais pesada até agora",
+    seg:{ pill:'forca', pillLabel:'FORÇA LOWER', meta:'Agachamento · Lunge · Step-up · Core',
+      tip:'<b>Semana 3:</b> Agachamento com mais carga. Última repetição deve ser difícil mas com boa forma.',
+      sections:[
+        { title:'Aquecimento', items:[
+          {name:'Esteira inclinada',detail:'10 min · inclinação 8%'},
+          {name:'Mobilidade quadril e tornozelo',detail:'5 min dinâmico'},
+        ]},
+        { title:'Exercícios', items:[
+          {name:'Agachamento livre',detail:'4 séries × 10 reps',badge:'90s',logWeight:true,target:'+2,5–5 kg vs semana 2'},
+          {name:'Lunge com halteres',detail:'3 séries × 12 cada perna',badge:'75s',logWeight:true,target:'16–18 kg cada'},
+          {name:'Step-up em banco',detail:'3 séries × 10 cada perna',badge:'60s',logWeight:true,target:'14–16 kg cada'},
+          {name:'Elevação de panturrilha',detail:'3 séries × 15 reps',badge:'45s'},
+        ]},
+        { title:'Core', items:[
+          {name:'Prancha frontal',detail:'3 séries × 40 segundos',badge:'45s'},
+          {name:'Dead bug',detail:'3 séries × 8 cada lado',badge:'45s'},
+        ]},
       ]},
-      { title:'Exercícios', items:[
-        { name:'Remada unilateral', detail:'4 séries × 10 cada · 28–32 kg', badge:'75s' },
-        { name:'Desenvolvimento halteres', detail:'3 séries × 10 · 16–20 kg', badge:'75s' },
-        { name:'Puxada polia pegada neutra', detail:'3 séries × 10 · carga moderada', badge:'75s' },
-        { name:"Farmer's Carry", detail:'4 percursos × 40 m · 24–28 kg cada mão', badge:'90s' },
+    ter:{ type:'run', pill:'corrida', pillLabel:'ZONE 2', meta:'Corrida leve contínua · 35 min',
+      tip:'<b>Zone 2:</b> Se semana 2 foi tranquila, pode tentar 7,5–8 km/h. O critério é sempre: consegue falar frases inteiras?',
+      warmup:'5 min caminhada',
+      main:'35 min corrida leve contínua',
+      pace:'7,5–8,0 km/h',
+      cooldown:'5 min caminhada',
+    },
+    qua:{ pill:'forca', pillLabel:'FORÇA UPPER', meta:"Remada · Desenvolvimento · Polia · Farmer's Carry",
+      tip:'<b>Semana 3:</b> Aumente carga nos exercícios principais. Flexões agora com pausa de 1s no chão.',
+      sections:[
+        { title:'Aquecimento', items:[
+          {name:'Remo leve ou bicicleta',detail:'8 min'},
+          {name:'Mobilidade de ombro',detail:'5 min dinâmico'},
+        ]},
+        { title:'Exercícios', items:[
+          {name:'Remada unilateral',detail:'4 séries × 10 cada',badge:'75s',logWeight:true,target:'28–30 kg'},
+          {name:'Desenvolvimento halteres',detail:'3 séries × 10',badge:'75s',logWeight:true,target:'16–18 kg'},
+          {name:'Puxada polia pegada neutra',detail:'3 séries × 10',badge:'75s',logWeight:true,target:'+5% vs semana 2'},
+          {name:"Farmer's Carry",detail:'4 percursos × 40 m',badge:'90s',logWeight:true,target:'24–26 kg cada mão'},
+        ]},
+        { title:'Core', items:[
+          {name:'Flexão de braço',detail:'3 séries × 10–12 reps',badge:'60s'},
+          {name:'Hollow hold',detail:'3 séries × 30 segundos',badge:'45s'},
+        ]},
       ]},
-      { title:'Core', items:[
-        { name:'Flexão de braço', detail:'3 séries × 10–12 reps', badge:'60s' },
-        { name:'Hollow hold', detail:'3 séries × 30 segundos', badge:'45s' },
+    qui:{ type:'run', pill:'corrida', pillLabel:'INTERVALADO', meta:'6 × 400 m · Esforço 7/10',
+      tip:'<b>Semana 3:</b> Volume completo de 400 m atingido. Agora o foco é manter consistência nos 6 tiros.',
+      warmup:'8 min corrida leve',
+      intervals:'6 × 400 m a 9 km/h',
+      rest:'90s caminhada entre cada tiro',
+      cooldown:'8 min caminhada',
+    },
+    sex:{ pill:'hibrido', pillLabel:'HÍBRIDO', meta:'4 × 800 m + exercício funcional',
+      tip:'<b>Semana 3:</b> Agora são 4 rounds — igual à estrutura Hyrox real. Bem-vindo ao treino de verdade.',
+      sections:[
+        { title:'Aquecimento', items:[{name:'Corrida leve',detail:'5 min'}]},
+        { title:'Rounds', items:[
+          {name:'Round 1 · 800 m',detail:'8–8,5 km/h → 20 lunges halteres 12 kg',badge:'90s',logWeight:true,target:'12 kg'},
+          {name:"Round 2 · 800 m",detail:"8–8,5 km/h → Farmer's Carry 40 m · 20 kg",badge:'90s',logWeight:true,target:'20 kg cada'},
+          {name:'Round 3 · 800 m',detail:'8–8,5 km/h → 20 agachamentos halteres 14 kg',badge:'90s',logWeight:true,target:'14 kg'},
+          {name:'Round 4 · 800 m',detail:'8–8,5 km/h → sem exercício (pace livre)',badge:null},
+        ]},
+        { title:'Desaquecimento', items:[{name:'Caminhada',detail:'5 min'}]},
       ]},
-    ]
   },
-  {
-    key:'qui', label:'Quinta', pill:'corrida', pillLabel:'INTERVALADO',
-    meta:'6 × 400 m forte · 8,5–10 km/h · Esforço 7/10',
-    tip:'<b>Dica:</b> O intervalo de 90s caminhando entre os tiros é parte do treino. Não encurte. O objetivo é repetir a qualidade em todos os 6 tiros.',
-    sections:[
-      { title:'Sessão', items:[
-        { name:'Corrida leve aquecimento', detail:'8 min · ritmo fácil', badge:'tempo' },
-        { name:'Tiro 1 — 400 m', detail:'Esforço 7/10 · 8,5–10 km/h + 90s caminhada', badge:'dist' },
-        { name:'Tiro 2 — 400 m', detail:'Esforço 7/10 · 8,5–10 km/h + 90s caminhada', badge:'dist' },
-        { name:'Tiro 3 — 400 m', detail:'Esforço 7/10 · 8,5–10 km/h + 90s caminhada', badge:'dist' },
-        { name:'Tiro 4 — 400 m', detail:'Esforço 7/10 · 8,5–10 km/h + 90s caminhada', badge:'dist' },
-        { name:'Tiro 5 — 400 m', detail:'Esforço 7/10 · 8,5–10 km/h + 90s caminhada', badge:'dist' },
-        { name:'Tiro 6 — 400 m', detail:'Esforço 7/10 · 8,5–10 km/h + 90s caminhada', badge:'dist' },
-        { name:'Caminhada desaquecimento', detail:'8 min', badge:'tempo' },
+  // ── SEMANA 4 — DELOAD ─────────────────────────────────────────────────
+  { week:4, label:"Deload — volume -30%. O músculo cresce agora.",
+    seg:{ pill:'forca', pillLabel:'FORÇA LOWER', meta:'Volume reduzido — mesmas cargas, menos séries',
+      tip:'<b>Deload:</b> Não pule essa semana. É quando a adaptação acontece. Mesmas cargas das semanas anteriores, mas só 2–3 séries.',
+      sections:[
+        { title:'Aquecimento', items:[
+          {name:'Esteira inclinada',detail:'8 min · inclinação 6%'},
+          {name:'Mobilidade quadril e tornozelo',detail:'5 min'},
+        ]},
+        { title:'Exercícios', items:[
+          {name:'Agachamento livre',detail:'2 séries × 8 reps',badge:'90s',logWeight:true,target:'Mesma carga semana 3'},
+          {name:'Lunge com halteres',detail:'2 séries × 10 cada perna',badge:'75s',logWeight:true,target:'Mesma carga semana 3'},
+          {name:'Step-up em banco',detail:'2 séries × 8 cada perna',badge:'60s',logWeight:true,target:'Mesma carga semana 3'},
+          {name:'Elevação de panturrilha',detail:'2 séries × 12 reps',badge:'45s'},
+        ]},
+        { title:'Core', items:[
+          {name:'Prancha frontal',detail:'2 séries × 40 segundos',badge:'45s'},
+          {name:'Dead bug',detail:'2 séries × 6 cada lado',badge:'45s'},
+        ]},
       ]},
-    ]
+    ter:{ type:'run', pill:'corrida', pillLabel:'ZONE 2', meta:'Corrida leve · 25 min — recuperação',
+      tip:'<b>Deload:</b> Menos 10 min que semana 3. Ritmo livre, sem pressão.',
+      warmup:'5 min caminhada',
+      main:'25 min corrida leve',
+      pace:'7,0–7,5 km/h — ritmo confortável',
+      cooldown:'5 min caminhada',
+    },
+    qua:{ pill:'forca', pillLabel:'FORÇA UPPER', meta:'Volume reduzido — recuperação ativa',
+      tip:'<b>Deload:</b> Reduza séries, não cargas. Foque em executar cada movimento perfeitamente.',
+      sections:[
+        { title:'Aquecimento', items:[
+          {name:'Remo leve',detail:'6 min'},
+          {name:'Mobilidade de ombro',detail:'5 min'},
+        ]},
+        { title:'Exercícios', items:[
+          {name:'Remada unilateral',detail:'2 séries × 10 cada',badge:'75s',logWeight:true,target:'Mesma carga semana 3'},
+          {name:'Desenvolvimento halteres',detail:'2 séries × 10',badge:'75s',logWeight:true,target:'Mesma carga semana 3'},
+          {name:'Puxada polia pegada neutra',detail:'2 séries × 10',badge:'75s',logWeight:true,target:'Mesma carga semana 3'},
+          {name:"Farmer's Carry",detail:'2 percursos × 40 m',badge:'90s',logWeight:true,target:'Mesma carga semana 3'},
+        ]},
+        { title:'Core', items:[
+          {name:'Flexão de braço',detail:'2 séries × 10 reps',badge:'60s'},
+          {name:'Hollow hold',detail:'2 séries × 25 segundos',badge:'45s'},
+        ]},
+      ]},
+    qui:{ type:'run', pill:'corrida', pillLabel:'INTERVALADO', meta:'4 × 400 m — volume reduzido',
+      tip:'<b>Deload:</b> Metade dos tiros da semana 3. Mantenha o ritmo, só menos volume.',
+      warmup:'8 min corrida leve',
+      intervals:'4 × 400 m a 9 km/h',
+      rest:'90s caminhada entre cada tiro',
+      cooldown:'8 min caminhada',
+    },
+    sex:{ pill:'hibrido', pillLabel:'HÍBRIDO', meta:'2 × 800 m + exercício — sessão curta',
+      tip:'<b>Deload:</b> 2 rounds apenas. Movimente o corpo sem acumular fadiga.',
+      sections:[
+        { title:'Aquecimento', items:[{name:'Corrida leve',detail:'5 min'}]},
+        { title:'Rounds', items:[
+          {name:'Round 1 · 800 m',detail:'8 km/h → 15 lunges halteres 12 kg',badge:'90s',logWeight:true,target:'12 kg'},
+          {name:"Round 2 · 800 m",detail:"8 km/h → Farmer's Carry 40 m · 20 kg",badge:'90s',logWeight:true,target:'20 kg'},
+        ]},
+        { title:'Desaquecimento', items:[{name:'Caminhada',detail:'5 min'}]},
+      ]},
   },
-  {
-    key:'sex', label:'Sexta', pill:'hibrido', pillLabel:'HÍBRIDO',
-    meta:'4 × 800 m corrida + exercício funcional',
-    tip:'<b>Este é o treino mais Hyrox do plano.</b> Simula a estrutura da prova: correr + exercício, correr + exercício. O objetivo não é ir rápido, é manter o ritmo constante nos 4 rounds.',
-    sections:[
-      { title:'Aquecimento', items:[
-        { name:'Corrida leve', detail:'5 min · ritmo tranquilo', badge:null },
+  // ── SEMANA 5 ─────────────────────────────────────────────────────────
+  { week:5, label:"Intensificação — cargas maiores, corridas mais longas",
+    seg:{ pill:'forca', pillLabel:'FORÇA LOWER', meta:'Agachamento · Lunge · Step-up · Core',
+      tip:'<b>Semana 5:</b> Novo bloco, novo patamar. Saia do deload com confiança. Use as cargas da sem. 3 como base mínima.',
+      sections:[
+        { title:'Aquecimento', items:[
+          {name:'Esteira inclinada',detail:'10 min · inclinação 8%'},
+          {name:'Mobilidade quadril e tornozelo',detail:'5 min dinâmico'},
+        ]},
+        { title:'Exercícios', items:[
+          {name:'Agachamento livre',detail:'4 séries × 10 reps',badge:'90s',logWeight:true,target:'≥ carga semana 3 + tentativa de +2,5 kg'},
+          {name:'Lunge com halteres',detail:'3 séries × 12 cada perna',badge:'75s',logWeight:true,target:'18–20 kg cada'},
+          {name:'Step-up em banco',detail:'3 séries × 12 cada perna',badge:'60s',logWeight:true,target:'16–18 kg cada'},
+          {name:'Elevação de panturrilha',detail:'4 séries × 15 reps',badge:'45s'},
+        ]},
+        { title:'Core', items:[
+          {name:'Prancha frontal',detail:'3 séries × 45 segundos',badge:'45s'},
+          {name:'Dead bug',detail:'3 séries × 10 cada lado',badge:'45s'},
+        ]},
       ]},
-      { title:'Rounds', items:[
-        { name:'Round 1 · 800 m corrida', detail:'8–8,5 km/h → 20 lunges halteres 12 kg', badge:'90s' },
-        { name:'Round 2 · 800 m corrida', detail:"8–8,5 km/h → Farmer's Carry 40 m · 20 kg", badge:'90s' },
-        { name:'Round 3 · 800 m corrida', detail:'8–8,5 km/h → 20 agachamentos halteres 14–16 kg', badge:'90s' },
-        { name:'Round 4 · 800 m corrida', detail:'8–8,5 km/h → sem exercício (pace livre)', badge:null },
+    ter:{ type:'run', pill:'corrida', pillLabel:'ZONE 2', meta:'Corrida leve · 35 min',
+      tip:'<b>Zone 2:</b> Após o deload, o corpo responde bem. Pode tentar manter 8 km/h se o esforço estiver confortável.',
+      warmup:'5 min caminhada',
+      main:'35 min corrida leve',
+      pace:'7,5–8,5 km/h',
+      cooldown:'5 min caminhada',
+    },
+    qua:{ pill:'forca', pillLabel:'FORÇA UPPER', meta:"Remada · Desenvolvimento · Polia · Farmer's Carry",
+      tip:"<b>Semana 5:</b> Farmer's Carry com carga maior. Tente manter o ritmo de passos constante sem diminuir.",
+      sections:[
+        { title:'Aquecimento', items:[
+          {name:'Remo leve ou bicicleta',detail:'8 min'},
+          {name:'Mobilidade de ombro',detail:'5 min'},
+        ]},
+        { title:'Exercícios', items:[
+          {name:'Remada unilateral',detail:'4 séries × 10 cada',badge:'75s',logWeight:true,target:'30–32 kg'},
+          {name:'Desenvolvimento halteres',detail:'4 séries × 10',badge:'75s',logWeight:true,target:'18–20 kg'},
+          {name:'Puxada polia pegada neutra',detail:'3 séries × 10',badge:'75s',logWeight:true,target:'+5% vs semana 3'},
+          {name:"Farmer's Carry",detail:'4 percursos × 40 m',badge:'90s',logWeight:true,target:'26–28 kg cada mão'},
+        ]},
+        { title:'Core', items:[
+          {name:'Flexão de braço',detail:'3 séries × 12 reps',badge:'60s'},
+          {name:'Hollow hold',detail:'3 séries × 35 segundos',badge:'45s'},
+        ]},
       ]},
-      { title:'Desaquecimento', items:[
-        { name:'Caminhada', detail:'5 min', badge:null },
+    qui:{ type:'run', pill:'corrida', pillLabel:'INTERVALADO', meta:'4 × 600 m · Esforço 7/10',
+      tip:'<b>Semana 5:</b> Os tiros ficam mais longos — 600 m em vez de 400 m. Ritmo um pouco mais conservador para aguentar a distância.',
+      warmup:'8 min corrida leve',
+      intervals:'4 × 600 m a 8,5–9 km/h',
+      rest:'2 min caminhada entre cada tiro',
+      cooldown:'8 min caminhada',
+    },
+    sex:{ pill:'hibrido', pillLabel:'HÍBRIDO', meta:'4 × 800 m + cargas maiores',
+      tip:'<b>Semana 5:</b> 4 rounds com cargas maiores que semana 3. O ritmo da corrida pode subir para 8,5 km/h.',
+      sections:[
+        { title:'Aquecimento', items:[{name:'Corrida leve',detail:'5 min'}]},
+        { title:'Rounds', items:[
+          {name:'Round 1 · 800 m',detail:'8,5 km/h → 20 lunges halteres 14 kg',badge:'90s',logWeight:true,target:'14 kg'},
+          {name:"Round 2 · 800 m",detail:"8,5 km/h → Farmer's Carry 40 m · 22 kg",badge:'90s',logWeight:true,target:'22 kg cada'},
+          {name:'Round 3 · 800 m',detail:'8,5 km/h → 20 agachamentos halteres 16 kg',badge:'90s',logWeight:true,target:'16 kg'},
+          {name:'Round 4 · 800 m',detail:'8,5 km/h → pace livre',badge:null},
+        ]},
+        { title:'Desaquecimento', items:[{name:'Caminhada',detail:'5 min'}]},
       ]},
-    ]
   },
-  {
-    key:'sab', label:'Sáb/Dom', pill:'descanso', pillLabel:'DESCANSO',
-    meta:'Recuperação ativa · caminhada leve se quiser',
-    tip:'<b>Recuperação é treino.</b> Nos dias de descanso o músculo cresce e o sistema cardiovascular se adapta. Não pule.',
-    sections:[
-      { title:'Opções', items:[
-        { name:'Caminhada leve na praia', detail:'20–40 min · ritmo passeio', badge:null },
-        { name:'Alongamento ou mobilidade', detail:'15–20 min opcional', badge:null },
-        { name:'Descanso total', detail:'Também é uma opção válida ✓', badge:null },
+  // ── SEMANA 6 ─────────────────────────────────────────────────────────
+  { week:6, label:"Volume máximo — semana mais exigente do plano",
+    seg:{ pill:'forca', pillLabel:'FORÇA LOWER', meta:'Agachamento · Lunge · Step-up · Core',
+      tip:'<b>Semana 6:</b> Pico de volume. As últimas reps do agachamento devem ser muito difíceis. Se não forem, aumente a carga.',
+      sections:[
+        { title:'Aquecimento', items:[
+          {name:'Esteira inclinada',detail:'10 min · inclinação 8%'},
+          {name:'Mobilidade quadril e tornozelo',detail:'5 min dinâmico'},
+        ]},
+        { title:'Exercícios', items:[
+          {name:'Agachamento livre',detail:'4 séries × 10 reps',badge:'90s',logWeight:true,target:'+2,5–5 kg vs semana 5'},
+          {name:'Lunge com halteres',detail:'4 séries × 12 cada perna',badge:'75s',logWeight:true,target:'18–20 kg cada'},
+          {name:'Step-up em banco',detail:'3 séries × 12 cada perna',badge:'60s',logWeight:true,target:'16–18 kg cada'},
+          {name:'Elevação de panturrilha',detail:'4 séries × 15 reps',badge:'45s'},
+        ]},
+        { title:'Core', items:[
+          {name:'Prancha frontal',detail:'3 séries × 50 segundos',badge:'45s'},
+          {name:'Dead bug',detail:'3 séries × 10 cada lado',badge:'45s'},
+        ]},
       ]},
-    ]
+    ter:{ type:'run', pill:'corrida', pillLabel:'ZONE 2', meta:'Corrida leve · 40 min',
+      tip:'<b>Zone 2:</b> 40 min contínuos. Essa é a maior corrida leve do plano. Ritmo é irrelevante — só não pare.',
+      warmup:'5 min caminhada',
+      main:'40 min corrida leve contínua',
+      pace:'7,5–8,5 km/h',
+      cooldown:'5 min caminhada',
+    },
+    qua:{ pill:'forca', pillLabel:'FORÇA UPPER', meta:"Volume máximo — 4 séries em tudo",
+      tip:'<b>Semana 6:</b> Pico de volume no upper também. Recupere bem na quinta (corrida leve).',
+      sections:[
+        { title:'Aquecimento', items:[
+          {name:'Remo leve ou bicicleta',detail:'8 min'},
+          {name:'Mobilidade de ombro',detail:'5 min'},
+        ]},
+        { title:'Exercícios', items:[
+          {name:'Remada unilateral',detail:'4 séries × 12 cada',badge:'75s',logWeight:true,target:'+2 kg vs semana 5'},
+          {name:'Desenvolvimento halteres',detail:'4 séries × 10',badge:'75s',logWeight:true,target:'+2 kg vs semana 5'},
+          {name:'Puxada polia pegada neutra',detail:'4 séries × 10',badge:'75s',logWeight:true,target:'+5% vs semana 5'},
+          {name:"Farmer's Carry",detail:'4 percursos × 40 m',badge:'90s',logWeight:true,target:'28–30 kg cada mão'},
+        ]},
+        { title:'Core', items:[
+          {name:'Flexão de braço',detail:'3 séries × 12 reps',badge:'60s'},
+          {name:'Hollow hold',detail:'3 séries × 40 segundos',badge:'45s'},
+        ]},
+      ]},
+    qui:{ type:'run', pill:'corrida', pillLabel:'INTERVALADO', meta:'5 × 600 m · Esforço 7/10',
+      tip:'<b>Semana 6:</b> Um tiro a mais. Tente manter o mesmo ritmo do início ao fim.',
+      warmup:'8 min corrida leve',
+      intervals:'5 × 600 m a 9 km/h',
+      rest:'2 min caminhada entre cada tiro',
+      cooldown:'8 min caminhada',
+    },
+    sex:{ pill:'hibrido', pillLabel:'HÍBRIDO', meta:'4 × 800 m + cargas de pico',
+      tip:'<b>Semana 6:</b> Cargas máximas no híbrido. A pausa de 90s é sagrada — não encurte.',
+      sections:[
+        { title:'Aquecimento', items:[{name:'Corrida leve',detail:'5 min'}]},
+        { title:'Rounds', items:[
+          {name:'Round 1 · 800 m',detail:'8,5–9 km/h → 20 lunges halteres 14–16 kg',badge:'90s',logWeight:true,target:'14–16 kg'},
+          {name:"Round 2 · 800 m",detail:"8,5–9 km/h → Farmer's Carry 40 m · 24 kg",badge:'90s',logWeight:true,target:'24 kg cada'},
+          {name:'Round 3 · 800 m',detail:'8,5–9 km/h → 20 agachamentos halteres 16–18 kg',badge:'90s',logWeight:true,target:'16–18 kg'},
+          {name:'Round 4 · 800 m',detail:'8,5–9 km/h → pace livre',badge:null},
+        ]},
+        { title:'Desaquecimento', items:[{name:'Caminhada',detail:'5 min'}]},
+      ]},
+  },
+  // ── SEMANA 7 — DELOAD 2 ───────────────────────────────────────────────
+  { week:7, label:"Deload 2 — recupere antes da semana de teste",
+    seg:{ pill:'forca', pillLabel:'FORÇA LOWER', meta:'Volume reduzido — preparação para semana 8',
+      tip:'<b>Deload 2:</b> Chegou longe. Agora deixe o corpo absorver tudo. Não tente forçar mais nessa semana.',
+      sections:[
+        { title:'Aquecimento', items:[
+          {name:'Esteira inclinada',detail:'8 min · inclinação 6%'},
+          {name:'Mobilidade quadril e tornozelo',detail:'5 min'},
+        ]},
+        { title:'Exercícios', items:[
+          {name:'Agachamento livre',detail:'2 séries × 8 reps',badge:'90s',logWeight:true,target:'Mesma carga semana 6'},
+          {name:'Lunge com halteres',detail:'2 séries × 10 cada perna',badge:'75s',logWeight:true,target:'Mesma carga semana 6'},
+          {name:'Step-up em banco',detail:'2 séries × 8 cada perna',badge:'60s',logWeight:true,target:'Mesma carga semana 6'},
+          {name:'Elevação de panturrilha',detail:'2 séries × 12 reps',badge:'45s'},
+        ]},
+        { title:'Core', items:[
+          {name:'Prancha frontal',detail:'2 séries × 45 segundos',badge:'45s'},
+          {name:'Dead bug',detail:'2 séries × 8 cada lado',badge:'45s'},
+        ]},
+      ]},
+    ter:{ type:'run', pill:'corrida', pillLabel:'ZONE 2', meta:'Corrida leve · 25 min',
+      tip:'<b>Deload:</b> Semana de recuperação. 25 min tranquilos.',
+      warmup:'5 min caminhada',
+      main:'25 min corrida leve',
+      pace:'7,0–7,5 km/h — sem pressão',
+      cooldown:'5 min caminhada',
+    },
+    qua:{ pill:'forca', pillLabel:'FORÇA UPPER', meta:'Volume reduzido — recuperação',
+      tip:'<b>Deload 2:</b> Mova o corpo, não force.',
+      sections:[
+        { title:'Aquecimento', items:[
+          {name:'Remo leve',detail:'6 min'},
+          {name:'Mobilidade de ombro',detail:'5 min'},
+        ]},
+        { title:'Exercícios', items:[
+          {name:'Remada unilateral',detail:'2 séries × 10 cada',badge:'75s',logWeight:true,target:'Mesma carga semana 6'},
+          {name:'Desenvolvimento halteres',detail:'2 séries × 10',badge:'75s',logWeight:true,target:'Mesma carga semana 6'},
+          {name:'Puxada polia pegada neutra',detail:'2 séries × 10',badge:'75s',logWeight:true,target:'Mesma carga semana 6'},
+          {name:"Farmer's Carry",detail:'2 percursos × 40 m',badge:'90s',logWeight:true,target:'Mesma carga semana 6'},
+        ]},
+        { title:'Core', items:[
+          {name:'Flexão de braço',detail:'2 séries × 10 reps',badge:'60s'},
+          {name:'Hollow hold',detail:'2 séries × 30 segundos',badge:'45s'},
+        ]},
+      ]},
+    qui:{ type:'run', pill:'corrida', pillLabel:'INTERVALADO', meta:'3 × 400 m — sessão curta',
+      tip:'<b>Deload:</b> Só 3 tiros. Mantenha a velocidade dos últimos intervalados, mas sem exagerar.',
+      warmup:'8 min corrida leve',
+      intervals:'3 × 400 m a 9–9,5 km/h',
+      rest:'90s caminhada entre cada tiro',
+      cooldown:'8 min caminhada',
+    },
+    sex:{ pill:'hibrido', pillLabel:'HÍBRIDO', meta:'2 × 800 m — sessão leve',
+      tip:'<b>Deload:</b> 2 rounds apenas. Guarde energia para a semana 8.',
+      sections:[
+        { title:'Aquecimento', items:[{name:'Corrida leve',detail:'5 min'}]},
+        { title:'Rounds', items:[
+          {name:'Round 1 · 800 m',detail:'8 km/h → 15 lunges halteres 12 kg',badge:'90s',logWeight:true,target:'12 kg'},
+          {name:"Round 2 · 800 m",detail:"8 km/h → Farmer's Carry 40 m · 20 kg",badge:'90s',logWeight:true,target:'20 kg'},
+        ]},
+        { title:'Desaquecimento', items:[{name:'Caminhada',detail:'5 min'}]},
+      ]},
+  },
+  // ── SEMANA 8 — TESTE FINAL ────────────────────────────────────────────
+  { week:8, label:"🏆 Semana de teste — veja o quanto evoluiu",
+    seg:{ pill:'forca', pillLabel:'FORÇA LOWER', meta:'Teste de carga — quanto você evoluiu?',
+      tip:'<b>Semana 8:</b> Tente um novo máximo no agachamento. Aquecimento completo, depois teste. Compare com a semana 1.',
+      sections:[
+        { title:'Aquecimento', items:[
+          {name:'Esteira inclinada',detail:'10 min · inclinação 8%'},
+          {name:'Mobilidade completa',detail:'8 min'},
+        ]},
+        { title:'Exercícios', items:[
+          {name:'Agachamento livre — TESTE',detail:'4 séries × 8 reps · tente novo máximo',badge:'120s',logWeight:true,target:'Supere a semana 6!'},
+          {name:'Lunge com halteres',detail:'3 séries × 12 cada perna',badge:'75s',logWeight:true,target:'Carga máxima sustentável'},
+          {name:'Step-up em banco',detail:'3 séries × 12 cada perna',badge:'60s',logWeight:true,target:'Carga máxima sustentável'},
+          {name:'Elevação de panturrilha',detail:'3 séries × 20 reps',badge:'45s'},
+        ]},
+        { title:'Core', items:[
+          {name:'Prancha frontal — TESTE',detail:'Quanto tempo aguenta?',badge:null},
+          {name:'Dead bug',detail:'3 séries × 10 cada lado',badge:'45s'},
+        ]},
+      ]},
+    ter:{ type:'run', pill:'corrida', pillLabel:'ZONE 2 · TESTE', meta:'Corrida contínua · 40 min — qual ritmo agora?',
+      tip:'<b>Teste:</b> Corra 40 min em Zone 2. Anote o ritmo que conseguiu manter. Compare com a semana 1 (7–7,5 km/h). Deve estar bem acima.',
+      warmup:'5 min caminhada',
+      main:'40 min corrida contínua — ritmo Zone 2',
+      pace:'Anote qual ritmo conseguiu manter confortavelmente',
+      cooldown:'5 min caminhada',
+    },
+    qua:{ pill:'forca', pillLabel:'FORÇA UPPER', meta:'Teste de carga — upper body',
+      tip:'<b>Semana 8:</b> Tente novo máximo na remada e no desenvolvimento. Compare com semana 1.',
+      sections:[
+        { title:'Aquecimento', items:[
+          {name:'Remo leve',detail:'8 min'},
+          {name:'Mobilidade de ombro',detail:'5 min'},
+        ]},
+        { title:'Exercícios', items:[
+          {name:'Remada unilateral — TESTE',detail:'4 séries × 10 · carga máxima',badge:'90s',logWeight:true,target:'Supere a semana 6!'},
+          {name:'Desenvolvimento halteres — TESTE',detail:'3 séries × 10 · carga máxima',badge:'90s',logWeight:true,target:'Supere a semana 6!'},
+          {name:'Puxada polia pegada neutra',detail:'3 séries × 10',badge:'75s',logWeight:true,target:'Carga máxima'},
+          {name:"Farmer's Carry — TESTE",detail:'4 percursos × 40 m · carga máxima',badge:'90s',logWeight:true,target:'Supere a semana 6!'},
+        ]},
+        { title:'Core', items:[
+          {name:'Flexão de braço — TESTE',detail:'Quantas consegue fazer seguidas?',badge:null},
+          {name:'Hollow hold',detail:'3 séries × 40 segundos',badge:'45s'},
+        ]},
+      ]},
+    qui:{ type:'run', pill:'corrida', pillLabel:'INTERVALADO · TESTE', meta:'6 × 400 m — qual ritmo máximo?',
+      tip:'<b>Teste:</b> Corra os 6 tiros no ritmo mais alto que conseguir manter consistente. Compare com a semana 1 (8,5 km/h). Deve estar em 10+ km/h.',
+      warmup:'8 min corrida leve',
+      intervals:'6 × 400 m — ritmo máximo sustentável',
+      rest:'90s caminhada entre cada tiro',
+      cooldown:'8 min caminhada',
+    },
+    sex:{ pill:'hibrido', pillLabel:'HÍBRIDO · TESTE', meta:'4 × 800 m — sessão de pico',
+      tip:'<b>🏆 Treino final:</b> Dê tudo que tem. Use as maiores cargas do híbrido que conseguir manter. Este é o treino que mostra onde você chegou.',
+      sections:[
+        { title:'Aquecimento', items:[{name:'Corrida leve',detail:'5 min'}]},
+        { title:'Rounds', items:[
+          {name:'Round 1 · 800 m',detail:'9 km/h → 20 lunges halteres — carga máx.',badge:'90s',logWeight:true,target:'Carga máxima'},
+          {name:"Round 2 · 800 m",detail:"9 km/h → Farmer's Carry 40 m — carga máx.",badge:'90s',logWeight:true,target:'Carga máxima'},
+          {name:'Round 3 · 800 m',detail:'9 km/h → 20 agachamentos — carga máx.',badge:'90s',logWeight:true,target:'Carga máxima'},
+          {name:'Round 4 · 800 m',detail:'9 km/h → pace livre — dê tudo',badge:null},
+        ]},
+        { title:'Desaquecimento', items:[{name:'Caminhada',detail:'10 min — você merece'}]},
+      ]},
   },
 ];
 
+const DESCANSO = {
+  key:'sab', label:'Sáb / Dom', pill:'descanso', pillLabel:'DESCANSO',
+  meta:'Recuperação ativa', isRest:true,
+  tip:'<b>Recuperação é treino.</b> O músculo cresce e o sistema cardiovascular se adapta nos dias de descanso. Não adicione treinos extras.',
+};
+
 // ── STATE ──────────────────────────────────────────────────────────────
-let currentWeek = parseInt(localStorage.getItem('cw') || '1');
-const TOTAL_WEEKS = 8;
+let currentWeek = parseInt(localStorage.getItem('cw')||'1');
 
-function stateKey(week, dayKey, exIdx) {
-  return `t_w${week}_${dayKey}_${exIdx}`;
-}
-function dayDoneKey(week, dayKey) {
-  return `done_w${week}_${dayKey}`;
-}
+function sk(w,d,i){ return `t_w${w}_${d}_${i}`; }
+function dk(w,d){ return `done_w${w}_${d}`; }
+function wk(w,d,i){ return `weight_w${w}_${d}_${i}`; }
+function getEx(w,d,i){ return localStorage.getItem(sk(w,d,i))==='1'; }
+function setEx(w,d,i,v){ localStorage.setItem(sk(w,d,i),v?'1':'0'); }
+function getDone(w,d){ return localStorage.getItem(dk(w,d))==='1'; }
+function setDone(w,d,v){ localStorage.setItem(dk(w,d),v?'1':'0'); }
+function getWeight(w,d,i){ return localStorage.getItem(wk(w,d,i))||''; }
+function saveWeight(w,d,i,v){ localStorage.setItem(wk(w,d,i),v); }
+// get previous week's weight
+function prevWeight(w,d,i){ return w>1?localStorage.getItem(wk(w-1,d,i))||'':''; }
 
-function getEx(week, dayKey, exIdx) {
-  return localStorage.getItem(stateKey(week, dayKey, exIdx)) === '1';
-}
-function setEx(week, dayKey, exIdx, val) {
-  localStorage.setItem(stateKey(week, dayKey, exIdx), val ? '1' : '0');
-}
-function getDayDone(week, dayKey) {
-  return localStorage.getItem(dayDoneKey(week, dayKey)) === '1';
-}
-function setDayDone(week, dayKey, val) {
-  localStorage.setItem(dayDoneKey(week, dayKey), val ? '1' : '0');
+function badgeHTML(b){
+  if(!b)return'';
+  if(b==='dist')return'<span class="ex-badge badge-dist">km</span>';
+  if(b==='tempo')return'<span class="ex-badge badge-tempo">⏱</span>';
+  return`<span class="ex-badge badge-pause">⏸ ${b}</span>`;
 }
 
-// ── RENDER ─────────────────────────────────────────────────────────────
-function badgeHTML(badge) {
-  if (!badge) return '';
-  if (badge === 'dist') return `<span class="ex-badge badge-dist">km</span>`;
-  if (badge === 'tempo') return `<span class="ex-badge badge-tempo">⏱</span>`;
-  return `<span class="ex-badge badge-pause">⏸ ${badge}</span>`;
+function renderRunDay(dayData, dayKey, w){
+  const isDone = getDone(w, dayKey);
+  const card = document.createElement('div');
+  card.className='day-card'+(isDone?' done':'');
+  card.id=`card-${dayKey}`;
+
+  const bodyHTML=`
+    <div class="section-label">Sessão</div>
+    <div class="run-block">
+      <div class="run-block-title">🔥 Aquecimento</div>
+      <div class="run-detail">${dayData.warmup}</div>
+    </div>
+    <div class="run-block" style="border:1px solid #1a3a1a;background:#0a1a0a">
+      <div class="run-block-title" style="color:var(--green)">🏃 ${dayData.intervals||dayData.main}</div>
+      <div class="run-detail">Ritmo: <span>${dayData.pace}</span>${dayData.rest?'<br>Descanso: <span>'+dayData.rest+'</span>':''}</div>
+    </div>
+    <div class="run-block">
+      <div class="run-block-title">❄️ Desaquecimento</div>
+      <div class="run-detail">${dayData.cooldown}</div>
+    </div>
+    ${dayData.tip?`<div class="tip-box">💡 ${dayData.tip}</div>`:''}
+  `;
+
+  card.innerHTML=`
+    <div class="day-header" onclick="toggleCard('${dayKey}')">
+      <button class="check-btn" onclick="toggleDone('${dayKey}',event)">${isDone?'✓':''}</button>
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="day-pill pill-${dayData.pill}">${dayData.pillLabel}</span>
+        </div>
+        <div class="day-title" style="margin-top:4px">${dayData.label||labelFor(dayKey)}</div>
+        <div class="day-meta">${dayData.meta}</div>
+      </div>
+      <span class="chevron">⌄</span>
+    </div>
+    <div class="day-body">${bodyHTML}</div>`;
+  return card;
 }
 
-function render() {
-  // Week tabs
-  const tabsEl = document.getElementById('week-tabs');
-  tabsEl.innerHTML = '';
-  for (let w=1; w<=TOTAL_WEEKS; w++) {
-    const t = document.createElement('div');
-    t.className = 'week-tab' + (w===currentWeek?' active':'');
-    t.textContent = `Sem. ${w}`;
-    t.onclick = () => { currentWeek=w; localStorage.setItem('cw',w); render(); };
-    tabsEl.appendChild(t);
-  }
+function labelFor(k){ return{seg:'Segunda',ter:'Terça',qua:'Quarta',qui:'Quinta',sex:'Sexta'}[k]||k; }
 
-  // Days
-  const container = document.getElementById('days-container');
-  container.innerHTML = '';
+function renderStrengthDay(dayData, dayKey, w){
+  const isDone = getDone(w, dayKey);
+  const card = document.createElement('div');
+  card.className='day-card'+(isDone?' done':'');
+  card.id=`card-${dayKey}`;
 
-  let doneDays = 0;
-  const trainDays = DAYS_DATA.filter(d=>d.pill!=='descanso').length;
-
-  DAYS_DATA.forEach(day => {
-    const isDone = getDayDone(currentWeek, day.key);
-    if (isDone && day.pill!=='descanso') doneDays++;
-
-    const card = document.createElement('div');
-    card.className = 'day-card' + (isDone?' done':'');
-    card.id = `card-${day.key}`;
-
-    // Count all exercises
-    const allEx = [];
-    day.sections.forEach(s => s.items.forEach((_, i) => allEx.push({s:s.title,i})));
-    let exOffset = 0;
-
-    let sectionsHTML = '';
-    day.sections.forEach(sec => {
-      sectionsHTML += `<div class="section-label">${sec.title}</div>`;
-      sec.items.forEach((ex, localIdx) => {
-        const globalIdx = exOffset + localIdx;
-        const checked = getEx(currentWeek, day.key, globalIdx);
-        sectionsHTML += `
-          <div class="exercise-row">
-            <div class="ex-check${checked?' checked':''}" 
-                 onclick="toggleEx('${day.key}',${globalIdx},this,event)">${checked?'✓':''}</div>
+  let exGlobal=0;
+  let sectionsHTML='';
+  dayData.sections.forEach(sec=>{
+    sectionsHTML+=`<div class="section-label">${sec.title}</div>`;
+    sec.items.forEach((ex,li)=>{
+      const gi=exGlobal++;
+      const checked=getEx(w,dayKey,gi);
+      const hasWeight=!!ex.logWeight;
+      const savedW=getWeight(w,dayKey,gi);
+      const prevW=prevWeight(w,dayKey,gi);
+      let weightHTML='';
+      if(hasWeight){
+        const suggText = prevW ? `Semana passada: ${prevW} kg` : (ex.target||'');
+        weightHTML=`
+          <div class="weight-row">
+            <span class="weight-label">⚖️ Carga usada:</span>
+            <input class="weight-input" type="number" inputmode="decimal" placeholder="kg"
+              value="${savedW}" onchange="saveWeightVal(${w},'${dayKey}',${gi},this.value)">
+            <span class="weight-sugg">${suggText}</span>
+          </div>`;
+      }
+      sectionsHTML+=`
+        <div class="exercise-row">
+          <div class="ex-top">
+            <div class="ex-check${checked?' checked':''}" onclick="toggleEx('${dayKey}',${gi},this,event)">${checked?'✓':''}</div>
             <div class="ex-info">
               <div class="ex-name${checked?' checked-text':''}">${ex.name}</div>
               <div class="ex-detail">${ex.detail}</div>
             </div>
-            ${badgeHTML(ex.badge)}
-          </div>`;
-      });
-      exOffset += sec.items.length;
-    });
-
-    const tipHTML = day.tip ? `<div class="tip-box">💡 ${day.tip}</div>` : '';
-
-    card.innerHTML = `
-      <div class="day-header" onclick="toggleCard('${day.key}')">
-        <button class="check-btn" onclick="toggleDone('${day.key}',event)">${isDone?'✓':''}</button>
-        <div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <span class="day-pill pill-${day.pill}">${day.pillLabel}</span>
+            ${badgeHTML(ex.badge||null)}
           </div>
-          <div class="day-title" style="margin-top:4px">${day.label}</div>
-          <div class="day-meta">${day.meta}</div>
-        </div>
-        <span class="chevron">⌄</span>
-      </div>
-      <div class="day-body">${sectionsHTML}${tipHTML}</div>`;
+          ${weightHTML}
+        </div>`;
+    });
+  });
+  const tipHTML=dayData.tip?`<div class="tip-box">💡 ${dayData.tip}</div>`:'';
 
+  card.innerHTML=`
+    <div class="day-header" onclick="toggleCard('${dayKey}')">
+      <button class="check-btn" onclick="toggleDone('${dayKey}',event)">${isDone?'✓':''}</button>
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="day-pill pill-${dayData.pill}">${dayData.pillLabel}</span>
+        </div>
+        <div class="day-title" style="margin-top:4px">${labelFor(dayKey)}</div>
+        <div class="day-meta">${dayData.meta}</div>
+      </div>
+      <span class="chevron">⌄</span>
+    </div>
+    <div class="day-body">${sectionsHTML}${tipHTML}</div>`;
+  return card;
+}
+
+function renderRestDay(w){
+  const isDone=getDone(w,'sab');
+  const card=document.createElement('div');
+  card.className='day-card'+(isDone?' done':'');
+  card.id='card-sab';
+  card.innerHTML=`
+    <div class="day-header" onclick="toggleCard('sab')">
+      <button class="check-btn" onclick="toggleDone('sab',event)">${isDone?'✓':''}</button>
+      <div style="flex:1">
+        <span class="day-pill pill-descanso">DESCANSO</span>
+        <div class="day-title" style="margin-top:4px">Sáb / Dom</div>
+        <div class="day-meta">Recuperação ativa</div>
+      </div>
+      <span class="chevron">⌄</span>
+    </div>
+    <div class="day-body">
+      <div class="tip-box" style="margin-top:4px">💡 ${DESCANSO.tip}</div>
+    </div>`;
+  return card;
+}
+
+function render(){
+  // tabs
+  const tabsEl=document.getElementById('week-tabs');
+  tabsEl.innerHTML='';
+  for(let w=1;w<=8;w++){
+    const t=document.createElement('div');
+    t.className='week-tab'+(w===currentWeek?' active':'');
+    t.textContent=`Sem. ${w}`;
+    t.onclick=()=>{ currentWeek=w; localStorage.setItem('cw',w); render(); };
+    tabsEl.appendChild(t);
+  }
+
+  const wData=PLAN[currentWeek-1];
+  const container=document.getElementById('days-container');
+  container.innerHTML='';
+
+  // Week label
+  const wLabel=document.createElement('div');
+  wLabel.style.cssText='font-size:12px;color:var(--orange);font-weight:600;letter-spacing:.5px;padding:0 4px 4px';
+  wLabel.textContent=`SEMANA ${currentWeek} — ${wData.label}`;
+  container.appendChild(wLabel);
+
+  const DAYKEYS=['seg','ter','qua','qui','sex'];
+  let doneDays=0;
+  DAYKEYS.forEach(k=>{
+    if(getDone(currentWeek,k)) doneDays++;
+    const d=wData[k];
+    let card;
+    if(d.type==='run') card=renderRunDay(d,k,currentWeek);
+    else card=renderStrengthDay(d,k,currentWeek);
     container.appendChild(card);
   });
+  container.appendChild(renderRestDay(currentWeek));
 
-  // Progress
-  const pct = trainDays > 0 ? Math.round(doneDays/trainDays*100) : 0;
-  document.getElementById('prog-fill').style.width = pct+'%';
-  document.getElementById('prog-label').textContent = `${doneDays} / ${trainDays} treinos`;
+  const pct=Math.round(doneDays/5*100);
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('prog-label').textContent=`${doneDays} / 5 treinos`;
 }
 
-function toggleCard(key) {
-  const card = document.getElementById(`card-${key}`);
-  card.classList.toggle('open');
+function toggleCard(key){
+  const c=document.getElementById(`card-${key}`);
+  c.classList.toggle('open');
 }
-
-function toggleDone(key, e) {
+function toggleDone(key,e){
   e.stopPropagation();
-  const isDone = getDayDone(currentWeek, key);
-  setDayDone(currentWeek, key, !isDone);
+  setDone(currentWeek,key,!getDone(currentWeek,key));
   render();
 }
-
-function toggleEx(dayKey, idx, el, e) {
+function toggleEx(dayKey,idx,el,e){
   e.stopPropagation();
-  const cur = getEx(currentWeek, dayKey, idx);
-  setEx(currentWeek, dayKey, idx, !cur);
+  const cur=getEx(currentWeek,dayKey,idx);
+  setEx(currentWeek,dayKey,idx,!cur);
   el.classList.toggle('checked');
-  el.textContent = !cur ? '✓' : '';
-  const nameEl = el.parentElement.querySelector('.ex-name');
-  nameEl.classList.toggle('checked-text', !cur);
+  el.textContent=!cur?'✓':'';
+  el.closest('.ex-top').querySelector('.ex-name').classList.toggle('checked-text',!cur);
 }
-
-// Install banner
-document.getElementById('install-close').onclick = () => {
-  document.getElementById('install-banner').style.display='none';
-};
-// Hide if already installed
-if (window.navigator.standalone) {
-  document.getElementById('install-banner').style.display='none';
+function saveWeightVal(w,dayKey,idx,val){
+  saveWeight(w,dayKey,idx,val);
 }
 
 render();
