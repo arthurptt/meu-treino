@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Meu Treino">
+<title>Meu Treino</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --orange: #E8541A;
+    --orange-dim: #b3400f;
+    --bg: #0f0f0f;
+    --bg2: #181818;
+    --bg3: #222;
+    --border: #2a2a2a;
+    --text: #f0f0f0;
+    --muted: #666;
+    --green: #3ecf6a;
+    --blue: #4a9eff;
+    --yellow: #f5c842;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    padding-bottom: env(safe-area-inset-bottom);
+    overscroll-behavior: none;
+  }
+
+  /* ── TOP NAV ── */
+  .topbar {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 20px 10px;
+    padding-top: calc(14px + env(safe-area-inset-top));
+  }
+  .topbar h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px; letter-spacing: 2px;
+    color: var(--orange);
+  }
+  .topbar p { font-size: 11px; color: var(--muted); margin-top:1px; }
+
+  /* ── WEEK TABS ── */
+  .week-tabs {
+    display: flex; gap: 6px;
+    padding: 14px 20px 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .week-tabs::-webkit-scrollbar { display:none; }
+  .week-tab {
+    flex-shrink: 0;
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 20px; padding: 6px 16px;
+    font-size: 12px; font-weight: 500; color: var(--muted);
+    cursor: pointer; transition: all .2s;
+  }
+  .week-tab.active {
+    background: var(--orange); border-color: var(--orange);
+    color: #fff; font-weight: 600;
+  }
+
+  /* ── DAY CARDS ── */
+  .days { padding: 16px 16px 100px; display: flex; flex-direction: column; gap: 12px; }
+
+  .day-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: border-color .2s;
+  }
+  .day-card.done { border-color: var(--green); opacity: .75; }
+
+  .day-header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 16px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .day-pill {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 11px; letter-spacing: 1.5px;
+    padding: 4px 10px; border-radius: 20px;
+    flex-shrink: 0;
+  }
+  .pill-forca  { background: #2a1a0a; color: #ffb347; }
+  .pill-corrida{ background: #0a1e2a; color: var(--blue); }
+  .pill-hibrido{ background: #1a0a2a; color: #c77dff; }
+  .pill-descanso{ background: #1a1a1a; color: var(--muted); }
+
+  .day-title { font-weight: 600; font-size: 15px; flex:1; }
+  .day-meta  { font-size: 11px; color: var(--muted); margin-top:1px; }
+
+  .chevron { color: var(--muted); font-size: 18px; transition: transform .25s; margin-left:auto; }
+  .day-card.open .chevron { transform: rotate(180deg); }
+
+  .check-btn {
+    width: 28px; height: 28px; border-radius: 50%;
+    border: 2px solid var(--border);
+    background: transparent;
+    display: flex; align-items:center; justify-content:center;
+    cursor: pointer; flex-shrink:0; transition: all .2s;
+    font-size: 14px; color: transparent;
+  }
+  .day-card.done .check-btn {
+    background: var(--green); border-color: var(--green); color: #fff;
+  }
+
+  /* ── BODY ── */
+  .day-body { display:none; padding: 0 16px 16px; }
+  .day-card.open .day-body { display:block; }
+
+  .section-label {
+    font-size: 10px; font-weight: 600; letter-spacing: 1.5px;
+    color: var(--orange); text-transform: uppercase;
+    margin: 14px 0 8px;
+  }
+
+  .exercise-row {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 10px 12px; border-radius: 10px;
+    background: var(--bg3); margin-bottom: 6px;
+  }
+  .ex-check {
+    width: 20px; height: 20px; border-radius: 5px;
+    border: 2px solid var(--border); background: transparent;
+    cursor: pointer; flex-shrink:0; margin-top:2px;
+    transition: all .15s; display:flex; align-items:center; justify-content:center;
+    font-size:11px; color:transparent;
+  }
+  .ex-check.checked { background: var(--green); border-color: var(--green); color:#fff; }
+
+  .ex-info { flex:1; }
+  .ex-name { font-size: 14px; font-weight: 500; }
+  .ex-name.checked-text { text-decoration: line-through; color: var(--muted); }
+  .ex-detail { font-size: 11px; color: var(--muted); margin-top:2px; }
+
+  .ex-badge {
+    font-size: 10px; font-weight: 600; letter-spacing:.5px;
+    padding: 2px 8px; border-radius: 20px; flex-shrink:0;
+  }
+  .badge-pause { background:#1a1a2a; color: #8899ff; }
+  .badge-dist  { background:#0a1a10; color: var(--green); }
+  .badge-tempo { background:#1a1500; color: var(--yellow); }
+
+  .tip-box {
+    background: #1a1200; border: 1px solid #3a2e00;
+    border-radius: 10px; padding: 10px 12px; margin-top: 10px;
+    font-size: 12px; color: #c9a84c; line-height: 1.5;
+  }
+  .tip-box b { color: var(--yellow); }
+
+  /* ── PROGRESS BAR ── */
+  .progress-wrap { padding: 0 20px 4px; }
+  .progress-label { display:flex; justify-content:space-between; font-size:11px; color:var(--muted); margin-bottom:5px; }
+  .progress-bar { height:4px; background:var(--border); border-radius:4px; overflow:hidden; }
+  .progress-fill { height:100%; background:var(--orange); border-radius:4px; transition: width .4s; }
+
+  /* ── BOTTOM LEGEND ── */
+  .legend {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--bg); border-top: 1px solid var(--border);
+    padding: 10px 20px;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));
+    display:flex; gap:16px; flex-wrap:wrap;
+  }
+  .legend-item { display:flex; align-items:center; gap:6px; font-size:11px; color:var(--muted); }
+  .legend-dot { width:8px; height:8px; border-radius:50%; }
+
+  /* ── INSTALL BANNER ── */
+  .install-banner {
+    margin: 12px 16px 0;
+    background: #111; border: 1px solid #2a2a00;
+    border-radius: 12px; padding: 10px 14px;
+    font-size: 12px; color: var(--yellow);
+    display: flex; align-items:center; gap:10px;
+  }
+  .install-banner span { color: var(--muted); }
+  #install-close { margin-left:auto; cursor:pointer; color:var(--muted); font-size:18px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>MEU TREINO</h1>
+  <p>Hyrox Training · Corrida + Força</p>
+</div>
+
+<div id="install-banner" class="install-banner">
+  📲 <span>Salvar na tela inicial: toque em <b style="color:#f5c842">⎙ Compartilhar</b> → <b style="color:#f5c842">Adicionar à Tela de Início</b></span>
+  <span id="install-close">×</span>
+</div>
+
+<div style="padding:14px 20px 0">
+  <div class="progress-wrap" style="padding:0">
+    <div class="progress-label">
+      <span>Semana atual</span>
+      <span id="prog-label">0 / 5 treinos</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+  </div>
+</div>
+
+<div class="week-tabs" id="week-tabs"></div>
+
+<div class="days" id="days-container"></div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#ffb347"></div>Força</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#4a9eff"></div>Corrida</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#c77dff"></div>Híbrido</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#444"></div>Descanso</div>
+</div>
+
+<script>
+const WEEKS = 8;
+const DAYS_DATA = [
+  {
+    key:'seg', label:'Segunda', pill:'forca', pillLabel:'FORÇA LOWER',
+    meta:'Agachamento · Lunge · Step-up · Panturrilha · Core',
+    tip:'<b>Dica:</b> Agachamento: desça até a coxa paralela ao chão. Nas primeiras semanas use 60% do máximo e foque na forma.',
+    sections:[
+      { title:'Aquecimento', items:[
+        { name:'Esteira inclinada', detail:'10 min · inclinação 6–8%', badge:null },
+        { name:'Mobilidade de quadril e tornozelo', detail:'5 min dinâmico', badge:null },
+      ]},
+      { title:'Exercícios', items:[
+        { name:'Agachamento livre', detail:'4 séries × 10 reps · 60–70% 1RM', badge:'90s' },
+        { name:'Lunge com halteres', detail:'3 séries × 12 cada perna · 16–18 kg', badge:'75s' },
+        { name:'Step-up em banco', detail:'3 séries × 10 cada perna · 14–16 kg', badge:'60s' },
+        { name:'Elevação de panturrilha', detail:'3 séries × 15 reps', badge:'45s' },
+      ]},
+      { title:'Core', items:[
+        { name:'Prancha frontal', detail:'3 séries × 40 segundos', badge:'45s' },
+        { name:'Dead bug', detail:'3 séries × 8 cada lado', badge:'45s' },
+      ]},
+    ]
+  },
+  {
+    key:'ter', label:'Terça', pill:'corrida', pillLabel:'ZONE 2',
+    meta:'Corrida leve · ~30 min · 7–8,5 km/h',
+    tip:'<b>Teste do sussurro:</b> você deve conseguir falar frases inteiras. Se não conseguir, diminua o ritmo. Zone 2 = 60–70% FC máx.',
+    sections:[
+      { title:'Sessão', items:[
+        { name:'Caminhada aquecimento', detail:'5 min', badge:'dist' },
+        { name:'Corrida leve (Zone 2)', detail:'25–30 min · 7–8,5 km/h · frase inteira', badge:'tempo' },
+        { name:'Caminhada desaquecimento', detail:'5 min', badge:'dist' },
+      ]},
+    ]
+  },
+  {
+    key:'qua', label:'Quarta', pill:'forca', pillLabel:'FORÇA UPPER',
+    meta:'Remada · Desenvolvimento · Polia · Farmer\'s Carry · Core',
+    tip:'<b>Farmer\'s Carry</b> é o exercício mais Hyrox do plano. Mantenha o core contraído, ombros para trás e passos firmes.',
+    sections:[
+      { title:'Aquecimento', items:[
+        { name:'Remo leve ou bicicleta', detail:'8 min', badge:null },
+        { name:'Mobilidade de ombro', detail:'5 min dinâmico', badge:null },
+      ]},
+      { title:'Exercícios', items:[
+        { name:'Remada unilateral', detail:'4 séries × 10 cada · 28–32 kg', badge:'75s' },
+        { name:'Desenvolvimento halteres', detail:'3 séries × 10 · 16–20 kg', badge:'75s' },
+        { name:'Puxada polia pegada neutra', detail:'3 séries × 10 · carga moderada', badge:'75s' },
+        { name:"Farmer's Carry", detail:'4 percursos × 40 m · 24–28 kg cada mão', badge:'90s' },
+      ]},
+      { title:'Core', items:[
+        { name:'Flexão de braço', detail:'3 séries × 10–12 reps', badge:'60s' },
+        { name:'Hollow hold', detail:'3 séries × 30 segundos', badge:'45s' },
+      ]},
+    ]
+  },
+  {
+    key:'qui', label:'Quinta', pill:'corrida', pillLabel:'INTERVALADO',
+    meta:'6 × 400 m forte · 8,5–10 km/h · Esforço 7/10',
+    tip:'<b>Dica:</b> O intervalo de 90s caminhando entre os tiros é parte do treino. Não encurte. O objetivo é repetir a qualidade em todos os 6 tiros.',
+    sections:[
+      { title:'Sessão', items:[
+        { name:'Corrida leve aquecimento', detail:'8 min · ritmo fácil', badge:'tempo' },
+        { name:'Tiro 1 — 400 m', detail:'Esforço 7/10 · 8,5–10 km/h + 90s caminhada', badge:'dist' },
+        { name:'Tiro 2 — 400 m', detail:'Esforço 7/10 · 8,5–10 km/h + 90s caminhada', badge:'dist' },
+        { name:'Tiro 3 — 400 m', detail:'Esforço 7/10 · 8,5–10 km/h + 90s caminhada', badge:'dist' },
+        { name:'Tiro 4 — 400 m', detail:'Esforço 7/10 · 8,5–10 km/h + 90s caminhada', badge:'dist' },
+        { name:'Tiro 5 — 400 m', detail:'Esforço 7/10 · 8,5–10 km/h + 90s caminhada', badge:'dist' },
+        { name:'Tiro 6 — 400 m', detail:'Esforço 7/10 · 8,5–10 km/h + 90s caminhada', badge:'dist' },
+        { name:'Caminhada desaquecimento', detail:'8 min', badge:'tempo' },
+      ]},
+    ]
+  },
+  {
+    key:'sex', label:'Sexta', pill:'hibrido', pillLabel:'HÍBRIDO',
+    meta:'4 × 800 m corrida + exercício funcional',
+    tip:'<b>Este é o treino mais Hyrox do plano.</b> Simula a estrutura da prova: correr + exercício, correr + exercício. O objetivo não é ir rápido, é manter o ritmo constante nos 4 rounds.',
+    sections:[
+      { title:'Aquecimento', items:[
+        { name:'Corrida leve', detail:'5 min · ritmo tranquilo', badge:null },
+      ]},
+      { title:'Rounds', items:[
+        { name:'Round 1 · 800 m corrida', detail:'8–8,5 km/h → 20 lunges halteres 12 kg', badge:'90s' },
+        { name:'Round 2 · 800 m corrida', detail:"8–8,5 km/h → Farmer's Carry 40 m · 20 kg", badge:'90s' },
+        { name:'Round 3 · 800 m corrida', detail:'8–8,5 km/h → 20 agachamentos halteres 14–16 kg', badge:'90s' },
+        { name:'Round 4 · 800 m corrida', detail:'8–8,5 km/h → sem exercício (pace livre)', badge:null },
+      ]},
+      { title:'Desaquecimento', items:[
+        { name:'Caminhada', detail:'5 min', badge:null },
+      ]},
+    ]
+  },
+  {
+    key:'sab', label:'Sáb/Dom', pill:'descanso', pillLabel:'DESCANSO',
+    meta:'Recuperação ativa · caminhada leve se quiser',
+    tip:'<b>Recuperação é treino.</b> Nos dias de descanso o músculo cresce e o sistema cardiovascular se adapta. Não pule.',
+    sections:[
+      { title:'Opções', items:[
+        { name:'Caminhada leve na praia', detail:'20–40 min · ritmo passeio', badge:null },
+        { name:'Alongamento ou mobilidade', detail:'15–20 min opcional', badge:null },
+        { name:'Descanso total', detail:'Também é uma opção válida ✓', badge:null },
+      ]},
+    ]
+  },
+];
+
+// ── STATE ──────────────────────────────────────────────────────────────
+let currentWeek = parseInt(localStorage.getItem('cw') || '1');
+const TOTAL_WEEKS = 8;
+
+function stateKey(week, dayKey, exIdx) {
+  return `t_w${week}_${dayKey}_${exIdx}`;
+}
+function dayDoneKey(week, dayKey) {
+  return `done_w${week}_${dayKey}`;
+}
+
+function getEx(week, dayKey, exIdx) {
+  return localStorage.getItem(stateKey(week, dayKey, exIdx)) === '1';
+}
+function setEx(week, dayKey, exIdx, val) {
+  localStorage.setItem(stateKey(week, dayKey, exIdx), val ? '1' : '0');
+}
+function getDayDone(week, dayKey) {
+  return localStorage.getItem(dayDoneKey(week, dayKey)) === '1';
+}
+function setDayDone(week, dayKey, val) {
+  localStorage.setItem(dayDoneKey(week, dayKey), val ? '1' : '0');
+}
+
+// ── RENDER ─────────────────────────────────────────────────────────────
+function badgeHTML(badge) {
+  if (!badge) return '';
+  if (badge === 'dist') return `<span class="ex-badge badge-dist">km</span>`;
+  if (badge === 'tempo') return `<span class="ex-badge badge-tempo">⏱</span>`;
+  return `<span class="ex-badge badge-pause">⏸ ${badge}</span>`;
+}
+
+function render() {
+  // Week tabs
+  const tabsEl = document.getElementById('week-tabs');
+  tabsEl.innerHTML = '';
+  for (let w=1; w<=TOTAL_WEEKS; w++) {
+    const t = document.createElement('div');
+    t.className = 'week-tab' + (w===currentWeek?' active':'');
+    t.textContent = `Sem. ${w}`;
+    t.onclick = () => { currentWeek=w; localStorage.setItem('cw',w); render(); };
+    tabsEl.appendChild(t);
+  }
+
+  // Days
+  const container = document.getElementById('days-container');
+  container.innerHTML = '';
+
+  let doneDays = 0;
+  const trainDays = DAYS_DATA.filter(d=>d.pill!=='descanso').length;
+
+  DAYS_DATA.forEach(day => {
+    const isDone = getDayDone(currentWeek, day.key);
+    if (isDone && day.pill!=='descanso') doneDays++;
+
+    const card = document.createElement('div');
+    card.className = 'day-card' + (isDone?' done':'');
+    card.id = `card-${day.key}`;
+
+    // Count all exercises
+    const allEx = [];
+    day.sections.forEach(s => s.items.forEach((_, i) => allEx.push({s:s.title,i})));
+    let exOffset = 0;
+
+    let sectionsHTML = '';
+    day.sections.forEach(sec => {
+      sectionsHTML += `<div class="section-label">${sec.title}</div>`;
+      sec.items.forEach((ex, localIdx) => {
+        const globalIdx = exOffset + localIdx;
+        const checked = getEx(currentWeek, day.key, globalIdx);
+        sectionsHTML += `
+          <div class="exercise-row">
+            <div class="ex-check${checked?' checked':''}" 
+                 onclick="toggleEx('${day.key}',${globalIdx},this,event)">${checked?'✓':''}</div>
+            <div class="ex-info">
+              <div class="ex-name${checked?' checked-text':''}">${ex.name}</div>
+              <div class="ex-detail">${ex.detail}</div>
+            </div>
+            ${badgeHTML(ex.badge)}
+          </div>`;
+      });
+      exOffset += sec.items.length;
+    });
+
+    const tipHTML = day.tip ? `<div class="tip-box">💡 ${day.tip}</div>` : '';
+
+    card.innerHTML = `
+      <div class="day-header" onclick="toggleCard('${day.key}')">
+        <button class="check-btn" onclick="toggleDone('${day.key}',event)">${isDone?'✓':''}</button>
+        <div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="day-pill pill-${day.pill}">${day.pillLabel}</span>
+          </div>
+          <div class="day-title" style="margin-top:4px">${day.label}</div>
+          <div class="day-meta">${day.meta}</div>
+        </div>
+        <span class="chevron">⌄</span>
+      </div>
+      <div class="day-body">${sectionsHTML}${tipHTML}</div>`;
+
+    container.appendChild(card);
+  });
+
+  // Progress
+  const pct = trainDays > 0 ? Math.round(doneDays/trainDays*100) : 0;
+  document.getElementById('prog-fill').style.width = pct+'%';
+  document.getElementById('prog-label').textContent = `${doneDays} / ${trainDays} treinos`;
+}
+
+function toggleCard(key) {
+  const card = document.getElementById(`card-${key}`);
+  card.classList.toggle('open');
+}
+
+function toggleDone(key, e) {
+  e.stopPropagation();
+  const isDone = getDayDone(currentWeek, key);
+  setDayDone(currentWeek, key, !isDone);
+  render();
+}
+
+function toggleEx(dayKey, idx, el, e) {
+  e.stopPropagation();
+  const cur = getEx(currentWeek, dayKey, idx);
+  setEx(currentWeek, dayKey, idx, !cur);
+  el.classList.toggle('checked');
+  el.textContent = !cur ? '✓' : '';
+  const nameEl = el.parentElement.querySelector('.ex-name');
+  nameEl.classList.toggle('checked-text', !cur);
+}
+
+// Install banner
+document.getElementById('install-close').onclick = () => {
+  document.getElementById('install-banner').style.display='none';
+};
+// Hide if already installed
+if (window.navigator.standalone) {
+  document.getElementById('install-banner').style.display='none';
+}
+
+render();
+</script>
+</body>
+</html>
